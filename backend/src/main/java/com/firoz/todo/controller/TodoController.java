@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/todo")
 public class TodoController {
@@ -17,31 +18,29 @@ public class TodoController {
   @Autowired
   TodoService todoService;
 
-  private List<Todo> todos;
-
   public TodoController() {
-    todos = new ArrayList<>();
-    /*todos.add(new Todo("nicoll", "Stéphane Nicoll"));
-    todos.add(new Todo("habuma", "Craig Wells"));
-    todos.add(new Todo("maciejwalkowiak", "Maciej Walkowiak"));
-    todos.add(new Todo("jitterted", "Ted M. Young"));
-    todos.add(new Todo("mraible", "Matt Raible"));*/
   }
 
 
   @GetMapping(value = "/findAll")
   public ResponseEntity<List<Todo>>  listTodo() {
-    return new ResponseEntity<>(todoService.findAll(), HttpStatus.FOUND);
+    return new ResponseEntity<>(todoService.findAll(), HttpStatus.OK);
   }
 
   @PostMapping(value = "/search")
   public ResponseEntity<List<Todo>>  searchTodo(@RequestBody Todo todo) {
-    return new ResponseEntity<>(todoService.searchCriteria(todo), HttpStatus.FOUND);
+    return new ResponseEntity<>(todoService.searchCriteria(todo), HttpStatus.OK);
   }
 
   @PostMapping(value = "/save")
   public ResponseEntity<Todo>  saveTodo(@RequestBody Todo todo) {
-    return new ResponseEntity<>(todoService.save(todo), HttpStatus.FOUND);
+    return new ResponseEntity<>(todoService.save(todo), HttpStatus.OK);
+  }
+
+  @DeleteMapping(value = "/delete")
+  public ResponseEntity<String>  deleteTodo(@RequestBody Todo todo) {
+    todoService.delete(todo);
+    return new ResponseEntity<>("Success", HttpStatus.OK);
   }
 
 

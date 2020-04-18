@@ -35,5 +35,10 @@ public class TodoServiceImpl implements TodoService {
         return repository.search(todo);
     }
 
+    @Override
+    public void delete(Todo todo) {
+        todoRepository.delete(todo);
+    }
+
 
 }

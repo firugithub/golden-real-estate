@@ -10,4 +10,6 @@ public interface TodoService {
     Todo save(Todo todo);
 
     List<Todo> searchCriteria(Todo todo);
+
+    void delete(Todo todo);
 }

@@ -11,7 +11,6 @@
                 <el-input
                   placeholder="Building Name"
                   v-model="buildingName"
-                  size="mini"
                 >
                 </el-input>
               </el-col>
@@ -19,7 +18,6 @@
                 <el-input
                   placeholder="Please input the activity"
                   v-model="activity"
-                  size="mini"
                 >
                 </el-input>
               </el-col>
@@ -27,7 +25,6 @@
                 <el-input
                   placeholder="Assigned To"
                   v-model="assignedTo"
-                  size="mini"
                 >
                 </el-input>
               </el-col>
@@ -71,18 +68,18 @@
               </el-alert>
             </div>
             <div v-else>
-              <b-container fluid>
+              <!-- <b-container> -->
                 <b-row class="my-1">
                   <b-col sm="5">
                    <div class="mt-2">Filtering for : {{ filtertext }}</div>
 
                     <b-form-input v-model="filtertext" placeholder="Enter keyword to Search"
-                    @change="processfilter"
+                    
                     ></b-form-input>
                   </b-col>
                 </b-row>
-              </b-container>
-              <el-table :data="activities" :row-class-name="tableRowColor"  :header-row-style="headerRowStyle">
+              <!-- </b-container> -->
+              <el-table  :data="filteredNames" :row-class-name="tableRowColor"  :header-row-style="headerRowStyle">
                 <el-table-column
                   label="Building"
                   class="font-weight-bold"
@@ -152,13 +149,13 @@
             </div>
           </div>
         </b-tab>
-        <b-tab title="STATUS BY BUILDINING">
+       <!--  <b-tab title="STATUS BY BUILDINING">
           <!-- <div>
             <b-table striped hover :items="activities"></b-table>
           </div> -->
-          <ActivityTable></ActivityTable>
-        </b-tab>
-        <b-tab title="STATUS BY ASSIGNED TO"><p>I'm a disabled tab!</p></b-tab>
+         <!--  <ActivityTable></ActivityTable> -->
+       <!--  </b-tab> -->
+        <!-- <b-tab title="STATUS BY ASSIGNED TO"><p>I'm a disabled tab!</p></b-tab> -->
       </b-tabs>
     </div>
 
@@ -172,6 +169,9 @@ import moment from "moment";
 import uuid from "uuid/v4";
 import ActivityTable from "./ActivityTable";
 import Popup from "./Popup";
+import todoservice from './../todoservice'
+import store  from './../store'
+
 export default {
   name: "Activity",
    components: {
@@ -189,16 +189,44 @@ export default {
       errorMessage: "",
     };
   },
+   mounted() {
+    console.log('Component has been created!');
+    if(this.$store.state.isLocalStore){
+            this.getActivities({ activity });
+        }else{
+          console.log('fetch db data');
+          todoservice.methods.getActivities();
+        }
+  },
   computed: {
+  filteredNames() {
+    return this.filtertext
+				? this.activities.filter(item => item.name.includes(this.filtertext) || item.building.includes(this.filtertext) || item.assigned.includes(this.filtertext))
+				: this.activities
+  },
     ...mapGetters({
+      
       activities: "getActivities",
+      
     }),
+    isTodoDataAvailable(){
+      if(this.$store.state.isLocalStore){
+            this.getActivities({ activity });
+        }else{
+          console.log('fetch db data');
+          // activities = Object.assign({}, activities, todoservice.methods.getActivities(activity))
+          activities=todoservice.methods.getActivities(activity);
+          this.updateStore({ activities });
+
+        }
+    },
     processfilter() {
       console.log('I am in filter');
       console.log(this.activities);
-        return this.filtertext
+      return this.filtertext;
+        /* return this.filtertext
 				? this.activities.filter(item => item.name.includes(this.filtertext) || item.building.includes(this.filtertext) || item.assigned.includes(this.filtertext))
-				: this.activities
+				: this.activities */
     },
     isWrongActivity() {
       return this.wrong;
@@ -209,12 +237,12 @@ export default {
     total() {
       return this.activities.length;
     },
-    isEmpty() {
-      return this.activities.length === 0;
-    },
+     isEmpty() {
+       return this.activities.length === 0;
+     },
   },
   methods: {
-    ...mapActions(["addActivity", "deleteActivity", "changeActivityState"]),
+    ...mapActions(["updateStore","addActivity", "deleteActivity", "changeActivityState","fetchToDobyCriteria","SET_ERROR"]),
     addActivityMethod() {
       if (this.validateData() === true) {
         const activity = {
@@ -225,17 +253,12 @@ export default {
           date: this.date,
           id: uuid(),
         };
-        var saveObj={
-          "id" : 0,
-          "building" : activity.building,
-          "name" : activity.name,
-          "completed" : activity.completed,
-          "assigned": activity.assigned,
-          "id" : activity.id,
-          "date":activity.date
+        if(this.$store.state.isLocalStore){
+            this.addActivity({ activity });
+        }else{
+          todoservice.methods.addActivity(activity);
         }
-        console.log(JSON.stringify(saveObj));
-        this.addActivity({ activity });
+        
         this.buildingName=""
         this.activity = "";
         this.assignedTo="";
@@ -255,10 +278,12 @@ export default {
     removeActivity(item) {
       console.log(item);
       this.deleteActivity({ activity: item });
+      todoservice.methods.deleteActivity(item);
     },
 
     completeActivity(item) {
       this.changeActivityState({ activity: item });
+      todoservice.methods.changeActivityState(item);
     },
     tableRowColor({ row, rowIndex }) {
       if (row.completed === true) {
@@ -331,8 +356,8 @@ div.cell {
 .el-input__inner {
   font-size: 14px!important;
 }
-.el-input--mini {
-       padding: 10px;
+.el-input {
+       padding: 5px;
 
 }
 .el-table thead th{

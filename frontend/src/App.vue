@@ -1,16 +1,18 @@
 <template>
   <div>
+    <grid-loader :loading="true" :color="blue" :size="size"></grid-loader>
+    <ErrorMessage />
     <Activity></Activity>
-    <!-- <ActivityTable></ActivityTable> -->
   </div>
 </template>
 
 <script>
   import Activity from "./components/Activity";
   import ActivityTable from "./components/ActivityTable";
+  import ErrorMessage from "./components/ErrorMessage";
 
   export default {
-    components: {Activity,ActivityTable},
+    components: {Activity,ActivityTable,ErrorMessage},
 
   }
 

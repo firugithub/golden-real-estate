@@ -7,15 +7,17 @@
 <script>
 import PopupTable from "./PopupTable";
 import Vue from 'vue'
+import todoservice from './../todoservice'
+
 
   export default {
     name: "PopupTable",
-    props: ["buildingName"],
+    props: ["buildingName","assignedTo"],
     data() {
       return {
         // Note `isActive` is left out and will not appear in the rendered table
         fields: ['name', 'date'],
-        items: [...this.$store.state.activities ] 
+        items: [...this.$store.state.filteredTodo ] 
       }
     },
     methods:{
@@ -23,6 +25,12 @@ import Vue from 'vue'
       const cloneSheepsES6 = [...this.$store.state.activities];
       return cloneSheepsES6;
     }
+    },
+    mounted() {
+      console.log("mounted popup");
+       /*   console.log(this.$store.state.searchObj);
+          this.items =  todoservice.methods.fetchToDobyCriteria(); */
+                 
     }
   }
 

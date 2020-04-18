@@ -7,13 +7,13 @@
         <div>
           <b-card no-body>
             <b-tabs pills card>
-              <b-tab title="Pending" active
+              <b-tab title="Pending" active @click="loadData('Pending')"
                 ><b-card-text>
                   <div>
-                    <PopupTable></PopupTable>
+                    <PopupTable v-bind:buildingName=buildingName></PopupTable>
                   </div> </b-card-text
               ></b-tab>
-              <b-tab title="Completed" ><b-card-text>
+              <b-tab title="Completed" @click="loadData('Completed')"><b-card-text>
                   <div>
                      <PopupTable></PopupTable>
                   </div>
@@ -29,9 +29,11 @@
 
 <script>
 import PopupTable from './PopupTable';
+import todoservice from './../todoservice'
+
 export default {
   name: "Popup",
-  props: ["buildingName"],
+  props: ["buildingName","assignedTo"],
    components: {
     PopupTable
   },
@@ -44,7 +46,20 @@ export default {
 },
   methods: {
     showModal() {
-      this.$refs["my-modal"].show();
+      var searchObj={
+          "id" : 0,
+          "building" : this.$props.buildingName,
+          "name" : "",
+          "completed" : false,
+          "assigned": "",
+          "date":""
+        }
+
+      this.$store.state.searchObj = searchObj;
+      this.loadData('Pending');
+      if(this.$store.state.showpopup){
+          this.$refs["my-modal"].show();
+      }
     },
     hideModal() {
       this.$refs["my-modal"].hide();
@@ -54,6 +69,14 @@ export default {
       // when the modal has hidden
       this.$refs["my-modal"].toggle("#toggle-btn");
     },
+    loadData(tab){
+      if(tab=='Pending'){
+        this.$store.state.searchObj.completed=false;
+      }else{
+         this.$store.state.searchObj.completed=true;
+      }
+        todoservice.methods.fetchToDobyCriteria();
+    }
   },
 };
 
