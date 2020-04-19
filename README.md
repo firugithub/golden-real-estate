@@ -36,5 +36,5 @@
     
 Access the application via  <http://localhost:8081/>
 
-## Screen Shots
+## Screen Shots attached in SmartTODO-FirozSubair.pdf
     
