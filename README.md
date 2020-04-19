@@ -30,8 +30,11 @@
 
    - C:\FirozSubair\golden-real-estate-master>**mvn --projects backend spring-boot:run**
     ( This will start the backend project )
+   
+   - C:\FirozSubair\golden-real-estate-master>**npm grunt server**
+    ( This will start the frontend project )
     
-Access the application via  <http://localhost:8080/>
+Access the application via  <http://localhost:8081/>
 
 ## Screen Shots
     
